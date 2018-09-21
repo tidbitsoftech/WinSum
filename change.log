@@ -1,0 +1,12 @@
+Version 1.5
+==============================
+1) Removed sections pertaining to cscript as cscript most likely wouldn't be used anyway.
+2) With the removal of the cscript sections, changed the "Wscript.Echo" statements to "MsgBox" statements
+3) Created a variable to hold the script's title for the MsgBox.
+4) Added a check to make sure that a file is being passed to the script.
+5) Removed some unused sections and unused statements
+6) Clarified some of the comments
+7) Added this change.log file
+8) Other misc fixes.
+9) Created an installer and uninstaller that creates/removes shortcuts in the user's SendTo folder for right-click access.
+10) Added MD5sum.

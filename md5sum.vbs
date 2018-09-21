@@ -5,7 +5,7 @@ Dim fso, CurrentDirectory
 
 ' Set the hashing algorithm
 ' the available hashes are <MD5 | SHA1 | SHA256 | SHA384 | SHA512>.  See "certutil" documentation for further details.
-strHashAlgorithm = "SHA256"   ' NOTE: this must be in ALL CAPS.  If not, certutil will produce an error.
+strHashAlgorithm = "MD5"   ' NOTE: this must be in ALL CAPS.  If not, certutil will produce an error.
 
 strPath = Wscript.ScriptFullName		' Determine the script's path and filename so we can include the common file later.
 set fso = CreateObject("Scripting.FileSystemObject")
