@@ -1,3 +1,12 @@
+Version 2.0
+==============================
+ 1) Give the project it's official name, WinSum.
+ 2) Remove the dependency on using individual wrapper files.
+ 3) Rename the install and uninstall scripts to Create and Remove.
+
+
+
+
 Version 1.5
 ==============================
 1) Removed sections pertaining to cscript as cscript most likely wouldn't be used anyway.
