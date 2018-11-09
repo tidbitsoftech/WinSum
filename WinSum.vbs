@@ -1,31 +1,37 @@
 Option Explicit
 
-' This file contains the common part used by all of the desired checksum scripts.
-' I have separated this out because any change in functionality can be done in one file rather than having to modify multiple files.
-
 Dim strFile, strText, strHash, strUserHash, strHashAlgorithm, strCompareHash, strMsg, strTitle, strVersion
 Dim int_StartPos, intLength
 Dim objShell, objExecObject
 
-strVersion = "1.5"
+' Set the title and version used in the MsgBox windows
+strVersion = "2.0"
+strTitle = "WinSum v" & strVersion
 
-' Do you want to compare calculated hash with known hash
-' Set this to TRUE if you want to be able to compare a known hash with the calculated hash.
-' Set to FALSE if you just want the calculated has to be displayed.
+' Set to TRUE if you want to be able to compare a known checksum with the calculated checksum (default).
+' Set to FALSE if you just want the calculated checksum to be displayed.
 strCompareHash = TRUE
 
-' Set the title used in the MsgBox windows
-strTitle = strHashAlgorithm & " checksum v" & strVersion
 
-' Check that a file has been specified.
-If Wscript.Arguments.Count = 0 Then
-	MsgBox "A file was not supplied.",,strTitle
+
+If Wscript.Arguments.Count <= 1 Then		' Check that a file has been specified.
+	MsgBox "Invalid number of arguments or a file was not supplied.",,strTitle
+	Wscript.Quit
+ElseIf Wscript.Arguments.Count > 2 Then		' Check that only one file is being passed.
+	MsgBox "It looks like you tried to check more than one file.",,strTitle
 	Wscript.Quit
 End if
 
-'Store the arguments.
-strFile = WScript.Arguments(0)
-'strHashAlgorithm= WScript.Arguments(1)
+' Parse the arguments.
+strHashAlgorithm = UCase(WScript.Arguments(0))	' The Algorithm has to be passed as uppercase or CertUtil will throw an error.
+Select Case strHashAlgorithm
+	Case "MD5","SHA1","SHA256","SHA512"		' These are valid
+	Case Else								' Anything else is an error
+		MsgBox "A valid algorithm was not specified.",,strTitle
+		Wscript.Quit
+End Select
+
+strFile = WScript.Arguments(1)
 
 Set objShell = WScript.CreateObject("WScript.Shell")
 Set objExecObject = objShell.Exec("cmd /c certutil -hashfile """ & strFile & """ " & strHashAlgorithm) ' "/c" causes the resulting window to close when it's finished.
@@ -41,6 +47,9 @@ Loop
 set objExecObject = Nothing
 set objShell = Nothing
 
+strHash = replace(strHash, " ", "")		' Remove any spaces from the resulting hash.
+strHash = lcase(strHash)	' convert to lower case
+
 ' Extract the file name from the full path
 int_StartPos = InstrRev(strFile, "\")		' Determine the starting position of the file name. First look for the path's trailing "\"
 If int_StartPos <> 0 Then		' If equal to 0, then there is no path info to remove and nothing to process
@@ -49,28 +58,19 @@ If int_StartPos <> 0 Then		' If equal to 0, then there is no path info to remove
 	strFile = Mid( strFile, (int_StartPos + 1), intLength)
 End If
 
-strHash = replace(strHash, " ", "")		' Remove the spaces from the resulting hash.
-strHash = lcase(strHash)	' convert to lower case
-
 If strCompareHash Then
-	strUserHash = trim(Inputbox(strHashAlgorithm & " hash of file:" & vbCrLF & strFile & vbCrLF & vbCrLF & strHash & vbCrLF & "Enter known hash below to compare:", strTitle))
-	strUserHash = lcase(strUserHash)	' convert the hash entered by the user to lower case
-	
+	strUserHash = trim(Inputbox(strHashAlgorithm & " checksum of file:" & vbCrLF & strFile & vbCrLF & vbCrLF & strHash & vbCrLF & "Enter known checksum below to compare:", strTitle))
+	strUserHash = lcase(strUserHash)	' convert the checksum entered by the user to lower case
+
 	if strUserHash <> "" Then
 		If strUserHash = strHash Then
 			strMsg = "The " & strHashAlgorithm & " checksums are the same." & vbCrLF
 		Else
 			strMsg = "The " & strHashAlgorithm & " checksums are -DIFFERENT-!" & vbCrLF
 		End if
-		strMsg = strMsg & vbCrLF & "File's hash: " & vbCrLF & strHash & vbCrLF & "You entered: " & vbCrLF & strUserHash
+		strMsg = strMsg & vbCrLF & "File's checksum: " & vbCrLF & strHash & vbCrLF & "You entered: " & vbCrLF & strUserHash
 		MsgBox strMsg,,strTitle
 	Else
-		'Dim strDontCare		'Used as a throw-away variable
-		'strMsg = "Use CTRL-C to copy the resulting checksum..." & vbCrLF & vbCrLF & vbCrLF
-		'strMsg = strMsg & strHashAlgorithm & " checksum of file:" & vbCrLF
-		'strMsg = strMsg & strFile
-		'strDontCare = Inputbox(strMsg, strTitle, strHash )
-		'================
 		MsgBox strFile & vbCrLF & vbCrLF & strHash,,strTitle
 	End If
 Else

@@ -1,19 +1,20 @@
 Option Explicit
 
 Dim fso, WshShell, strSendTo
-Dim strMsg, strContinue, strTitle, strFile
+Dim strMsg, strContinue, strTitle, strFile, strProg
 Dim strSuccess, strFailed
 
-strTitle = "Uninstall Shortcuts"
+strProg = "WinSum"
+strTitle = strProg & " - Remove Shortcuts"
 
-' Explain to the user what is about to happen...
-strMsg = "You are about to delete the shortcuts in your SendTo folder" & vbCrLF
-strMsg = strMsg & "for the Checksum scripts.  Do you wish to continue?" & vbCrLF & vbCrLF
+' Explain what is about to happen...
+strMsg = "You are about to remove the " & strProg & " shortcuts from" & vbCrLF
+strMsg = strMsg & "your SendTo folder.  Do you wish to continue?" & vbCrLF & vbCrLF
 strMsg = strMsg & "Click OK to continue or Cancel to quit."
 
 strContinue =  MsgBox (strMsg,vbOKCancel,strTitle)
 If strContinue <> 1 Then    'if user input equals anything other than OK, then quit.
-	MsgBox "Operation has been cancelled."
+	MsgBox "Operation has been cancelled.",,strTitle
 	Wscript.Quit
 End If
 
@@ -27,10 +28,10 @@ strFailed = ""
 
 set fso = CreateObject("Scripting.FileSystemObject")
 
-delete_shortcut "md5sum.vbs"
-delete_shortcut "sha1sum.vbs"
-delete_shortcut "sha256sum.vbs"
-delete_shortcut "sha512sum.vbs"
+delete_shortcut strProg & " - MD5sum"
+delete_shortcut strProg & " - sha1sum"
+delete_shortcut strProg & " - sha256sum"
+delete_shortcut strProg & " - sha512sum"
 
 set fso = nothing
 
